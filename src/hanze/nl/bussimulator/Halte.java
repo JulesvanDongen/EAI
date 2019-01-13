@@ -34,15 +34,15 @@ public enum Halte {
 		this.positie = positie;
 	}
 	
-	int afstand(Positie vanaf) {
+	public int afstand(Positie vanaf) {
 		return 2*Math.abs(positie.x-vanaf.x)+Math.abs(positie.y-vanaf.y);
 	}
 	
-	Positie getPositie() {
+	public Positie getPositie() {
 		return positie;
 	}
 	
-	static class Positie {
+	public static class Positie {
 		int x;
 		int y;
 		

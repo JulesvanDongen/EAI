@@ -32,7 +32,7 @@ public class ETA {
 		return aankomsttijd;
 	}
 
-	ETA(String halteNaam, int richting, int aankomsttijd){
+	public ETA(String halteNaam, int richting, int aankomsttijd){
 		this.halteNaam=halteNaam;
 		this.richting=richting;
 		this.aankomsttijd=aankomsttijd;

@@ -19,6 +19,7 @@ public class Bericht {
 	String lijnNaam;
 
 	@XmlElement
+	public
 	String eindpunt;
 
 	@XmlElement
@@ -31,6 +32,7 @@ public class Bericht {
 	int tijd;
 
 	@XmlElement
+	public
 	ArrayList<ETA> ETAs;
 
 	Bericht() {
@@ -42,7 +44,7 @@ public class Bericht {
 		this.ETAs=new ArrayList<ETA>();
 	}
 	
-	Bericht(String lijnNaam, String bedrijf, String busID, int tijd){
+	public Bericht(String lijnNaam, String bedrijf, String busID, int tijd){
 		this.lijnNaam=lijnNaam;
 		this.bedrijf=bedrijf;
 		this.eindpunt="";
