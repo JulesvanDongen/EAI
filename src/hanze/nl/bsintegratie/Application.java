@@ -84,8 +84,9 @@ public class Application implements MessageListener {
                         bericht.getLijnNaam(),
                         bericht.getBusID(),
                         bericht.getBedrijf(),
-                        bericht.getEindpunt()
+                        eta.getHalteNaam()
                 );
+
                 String jsonString = mapper.writeValueAsString(jsonBericht);
                 TextMessage jsonMessage = new ActiveMQTextMessage();
                 jsonMessage.setText(jsonString);
