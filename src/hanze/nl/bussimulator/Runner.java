@@ -1,4 +1,5 @@
 package hanze.nl.bussimulator;
+import hanze.nl.tijdtools.TijdFuncties;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -13,7 +14,8 @@ public class Runner {
 	private static HashMap<Integer,ArrayList<Bus>> busStart = new HashMap<Integer,ArrayList<Bus>>();
 	private static ArrayList<Bus> actieveBussen = new ArrayList<Bus>();
 	private static int interval=1000;
-	
+	private static int syncInterval=5;
+
 	private static void addBus(int starttijd, Bus bus){
 		ArrayList<Bus> bussen = new ArrayList<Bus>();
 		if (busStart.containsKey(starttijd)) {
@@ -96,19 +98,36 @@ public class Runner {
 		return Collections.min(busStart.keySet());
 	}
 	
-	public static void main(String[] args) throws InterruptedException {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.INFO);
+//	public static void main(String[] args) throws InterruptedException {
+//		BasicConfigurator.configure();
+//		Logger.getRootLogger().setLevel(Level.INFO);
+//
+//		int tijd=0;
+//		int volgende = initBussen();
+//		while ((volgende>=0) || !actieveBussen.isEmpty()) {
+//			System.out.println("De tijd is:" + tijd);
+//			volgende = (tijd==volgende) ? startBussen(tijd) : volgende;
+//			moveBussen(tijd);
+//			sendETAs(tijd);
+//			Thread.sleep(interval);
+//			tijd++;
+//		}
+//	}
 
+	public static void main(String[] args) throws InterruptedException {
 		int tijd=0;
+		int counter=0;
+		TijdFuncties tijdFuncties = new TijdFuncties();
+		tijdFuncties.initSimulatorTijden(interval, syncInterval);
 		int volgende = initBussen();
 		while ((volgende>=0) || !actieveBussen.isEmpty()) {
-			System.out.println("De tijd is:" + tijd);
-			volgende = (tijd==volgende) ? startBussen(tijd) : volgende;
+			counter=tijdFuncties.getCounter();
+			tijd=tijdFuncties.getTijdCounter();
+			System.out.println("De tijd is:" + tijdFuncties.getSimulatorWeergaveTijd());
+			volgende = (counter==volgende) ? startBussen(counter) : volgende;
 			moveBussen(tijd);
 			sendETAs(tijd);
-			Thread.sleep(interval);
-			tijd++;
+			tijdFuncties.simulatorStep();
 		}
 	}
 }
