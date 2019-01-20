@@ -50,6 +50,10 @@ public class Application implements MessageListener {
         MessageProducer flixbusLoggerProducer = queueSession.createProducer(flixbusloggerQueue);
         producerMap.put("FLIXBUS", flixbusLoggerProducer);
 
+        Queue qbuzzlogger = queueSession.createQueue("QBUZZLOGGER");
+        MessageProducer producer = queueSession.createProducer(qbuzzlogger);
+        producerMap.put("QBUZZ", producer);
+
         // Set up topic connection for sending to topic
         TopicConnection topicConnection = connectionFactory.createTopicConnection();
         topicConnection.setClientID("intermediate");
@@ -95,7 +99,6 @@ public class Application implements MessageListener {
             // Log het bericht
             MessageProducer logProducer = producerMap.get(bericht.getBedrijf());
             if (logProducer != null) {
-                System.out.println("Logging: " + textMessage.getText());
                 logProducer.send(message);
             }
 
