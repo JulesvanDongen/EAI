@@ -115,6 +115,9 @@ public class Runner {
 //	}
 
 	public static void main(String[] args) throws InterruptedException {
+		BasicConfigurator.configure();
+		Logger.getRootLogger().setLevel(Level.INFO);
+
 		int tijd=0;
 		int counter=0;
 		TijdFuncties tijdFuncties = new TijdFuncties();

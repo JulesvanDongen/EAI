@@ -9,11 +9,17 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import com.thoughtworks.xstream.XStream;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import hanze.nl.bussimulator.Bericht;
 
 public class ArrivaLogger {
 	
 	public static void main (String[] args){
-		
+		BasicConfigurator.configure();
+		Logger.getRootLogger().setLevel(Level.INFO);
+
     try {
 	        ActiveMQConnectionFactory connectionFactory = 
 	        		new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);

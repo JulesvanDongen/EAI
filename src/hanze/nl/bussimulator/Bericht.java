@@ -1,6 +1,7 @@
 package hanze.nl.bussimulator;
 
 import com.sun.jndi.ldap.Ber;
+import com.thoughtworks.xstream.XStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -54,15 +55,21 @@ public class Bericht {
 	}
 
 	public String toXML() throws JAXBException {
-		JAXBContext context = JAXBContext.newInstance(this.getClass());
+//		JAXBContext context = JAXBContext.newInstance(this.getClass());
+//
+//		Marshaller marshaller  = context.createMarshaller();
+//
+//		StringWriter sw = new StringWriter();
+//		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+//		marshaller.marshal(this, sw);
+//
+//		return sw.toString();
 
-		Marshaller marshaller  = context.createMarshaller();
-
-		StringWriter sw = new StringWriter();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		marshaller.marshal(this, sw);
-
-		return sw.toString();
+		XStream xStream = new XStream();
+		xStream.alias("Bericht", Bericht.class);
+		xStream.alias("ETA", ETA.class);
+		String s = xStream.toXML(this);
+		return s;
 	}
 
 	public String getLijnNaam() {
@@ -90,9 +97,14 @@ public class Bericht {
 	}
 
 	public static Bericht fromXML(String xml) throws JAXBException {
-		JAXBContext jaxbContext = JAXBContext.newInstance(Bericht.class);
-		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-		StringReader stringReader = new StringReader(xml);
-		return (Bericht) unmarshaller.unmarshal(stringReader);
+//		JAXBContext jaxbContext = JAXBContext.newInstance(Bericht.class);
+//		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+//		StringReader stringReader = new StringReader(xml);
+//		return (Bericht) unmarshaller.unmarshal(stringReader);
+
+		XStream xStream = new XStream();
+		xStream.alias("Bericht", Bericht.class);
+		xStream.alias("ETA", ETA.class);
+		return (Bericht) xStream.fromXML(xml);
 	}
 }

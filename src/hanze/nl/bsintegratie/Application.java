@@ -1,14 +1,12 @@
 package hanze.nl.bsintegratie;
 
+import hanze.nl.bussimulator.Bedrijven;
 import hanze.nl.bussimulator.Bericht;
 import hanze.nl.bussimulator.Bus;
 import hanze.nl.bussimulator.ETA;
 import hanze.nl.infobord.JSONBericht;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.region.DestinationFactory;
-import org.apache.activemq.broker.region.DestinationFactoryImpl;
-import org.apache.activemq.camel.CamelDestination;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -20,19 +18,37 @@ import org.codehaus.jackson.map.ObjectMapper;
 import javax.jms.*;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Application implements MessageListener {
 
     private Session xmlSession;
-    private boolean  transacted = false;
+    private boolean transacted = false;
     private MessageProducer replyProducer;
     private final Connection xmlConnection;
     private final MessageProducer topicProducer;
+    private final Map<String, MessageProducer> producerMap;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     public Application() throws JMSException {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
+
+        // Create queues for the loggers
+        producerMap = new HashMap<>();
+
+        QueueConnection queueConnection = connectionFactory.createQueueConnection();
+        queueConnection.setClientID("intermediate-logger");
+        QueueSession queueSession = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+
+        Queue arrivaloggerQueue = queueSession.createQueue("ARRIVALOGGER");
+        MessageProducer arrivaLoggerProducer = queueSession.createProducer(arrivaloggerQueue);
+        producerMap.put("ARRIVA", arrivaLoggerProducer);
+
+        Queue flixbusloggerQueue = queueSession.createQueue("FLIXBUSLOGGER");
+        MessageProducer flixbusLoggerProducer = queueSession.createProducer(flixbusloggerQueue);
+        producerMap.put("FLIXBUS", flixbusLoggerProducer);
 
         // Set up topic connection for sending to topic
         TopicConnection topicConnection = connectionFactory.createTopicConnection();
@@ -57,7 +73,6 @@ public class Application implements MessageListener {
         //Set up a consumer to consume messages off of the admin queue
         MessageConsumer consumer = this.xmlSession.createConsumer(busQueue);
         consumer.setMessageListener(this);
-
     }
 
     public static void main(String[] args) {
@@ -77,6 +92,14 @@ public class Application implements MessageListener {
         try {
             Bericht bericht = Bericht.fromXML(textMessage.getText());
 
+            // Log het bericht
+            MessageProducer logProducer = producerMap.get(bericht.getBedrijf());
+            if (logProducer != null) {
+                System.out.println("Logging: " + textMessage.getText());
+                logProducer.send(message);
+            }
+
+            // Transformeer het bericht naar iets bruikbaars voor de InfoBord klasse
             for (ETA eta : bericht.getETAs()) {
                 JSONBericht jsonBericht = new JSONBericht(
                         bericht.getTijd(),
